@@ -13,26 +13,26 @@
     <div class="col-md-offset-1 col-md-10" style="margin-top: 15px">
         <div class="box box-success">
             <h3>ADD STUDENT <a href="/" class="btn btn-default pull-right"><i class="glyphicon glyphicon-home"></i></a><a href="/student-list" class="btn btn-default pull-right"><i class="glyphicon glyphicon-th-list"></i></a></h3><hr>
-            <form action="/add-student" method="post">
-                <p><div class="form-inline">
-                    <label class="col-md-2">Student ID: </label>
-                    <input type="text" class="form-control" id="student_ID" name="student_ID">
+            <form action="/add-student" method="post" id="form-add-student">
+                <p><div class="form-group">
+                    <label>Student ID: </label>
+                    <input type="text" class="form-control" id="student_ID" name="student_ID" style="width: 50%">
                 </div></p>
-                <p><div class="form-inline">
-                    <label class="col-md-2">Student name: </label>
-                    <input type="text" class="form-control" id="student_name" name="student_name">
+                <p><div class="form-group">
+                    <label>Student name: </label>
+                    <input type="text" class="form-control" id="student_name" name="student_name" style="width: 50%">
                 </div></p>
-                <p><div class="form-inline">
-                    <label class="col-md-2">Date of birth: </label>
-                    <input type="date" class="form-control" id="date" name="date">
+                <p><div class="form-group">
+                    <label>Date of birth: </label>
+                    <input type="date" class="form-control" id="date" name="date" style="width: 50%">
                 </div></p>
-                <p><div class="form-inline">
-                    <label class="col-md-2">Class: </label>
-                    <input type="text" class="form-control" id="class" name="class">
+                <p><div class="form-group">
+                    <label>Class: </label>
+                    <input type="text" class="form-control" id="class" name="class" style="width: 50%">
                 </div></p>
-                <p><div class="form-inline">
-                    <label class="col-md-2">PersonId: </label>
-                    <input type="text" class="form-control" id="personId" name="personId">
+                <p><div class="form-group">
+                    <label>PersonId: </label>
+                    <input type="text" class="form-control" id="personId" name="personId" style="width: 50%">
                 </div></p><hr>
                 <p><input type="submit" class="btn btn-success" value="Submit"></p>
             </form>

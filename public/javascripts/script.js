@@ -131,4 +131,70 @@ $(function(){
     $('#buttonCancelDeleteStudent').click(function(){
         $('#listStudentId').val('');
     });
+    $('#form-add-student').validate({
+        rules: {
+            student_ID: 'required',
+            student_name: 'required',
+            date: 'required',
+            class: 'required',
+            personId: 'required'
+        },
+        messages: {
+            student_ID: 'Please fill out this field',
+            student_name: 'Please fill out this field',
+            date: 'Please fill out this field',
+            class: 'Please fill out this field',
+            personId: 'Please fill out this field'
+        },
+        errorElement: "em",
+        errorPlacement: function (error, element) {
+            // Add the `help-block` class to the error element
+            error.addClass("help-block");
+
+            if (element.prop("type") === "checkbox") {
+                error.insertAfter(element.parent("label"));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).closest(".form-group").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).closest(".form-group").removeClass("has-error");
+        }
+    });
+    $("#form-edit-student").validate({
+        rules: {
+            student_ID: 'required',
+            student_name: 'required',
+            date: 'required',
+            class: 'required',
+            personId: 'required'
+        },
+        messages: {
+            student_ID: 'Please fill out this field',
+            student_name: 'Please fill out this field',
+            date: 'Please fill out this field',
+            class: 'Please fill out this field',
+            personId: 'Please fill out this field'
+        },
+        errorElement: "em",
+        errorPlacement: function (error, element) {
+            // Add the `help-block` class to the error element
+            error.addClass("help-block");
+
+            if (element.prop("type") === "checkbox") {
+                error.insertAfter(element.parent("label"));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).closest(".form-group").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).closest(".form-group").removeClass("has-error");
+        }
+    })
 });
