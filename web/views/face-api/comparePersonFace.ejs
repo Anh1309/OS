@@ -63,7 +63,11 @@
                         for (var indexResult = 0; indexResult < result.length; indexResult++) {
                             listFaceId.push(result[indexResult].faceId);
                         }
-                        $("#listFaceId").html('listFaceId: ' + listFaceId);
+                        if (listFaceId.length>0){
+                            $("#listFaceId").html('listFaceId: ' + listFaceId);
+                        } else {
+                            $("#form-submit-indentical-personId").submit();
+                        }
                         <%
                         if (indexImage + 1 == listImage.length) {
                             %>
