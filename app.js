@@ -53,6 +53,9 @@ app.post('/face-api/submit-indentical-personId', ApiController.submitIndenticalP
 app.post('/face-api/verify-faces', ApiController.verifyFaces);
 app.get('/face-api/verify-faces', ApiController.verifyFaces);
 
+app.get('/verify-by-one-click', ApiController.verify_by_one_click);
+app.get('/analyze-video-auto-processing', ApiController.analyze_video_auto_processing);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -49,11 +49,14 @@ module.exports = {
 	/* @author: phuc */
 	/* test compare face with face using face-api */
 	comparePersonFace: function(req, res, next){
-		var key = '70a5f8d52d2d4d34909ddf5f3624782c';
-		var listImage = req.body.imageURL;
-		if (!listImage || listImage.length == 0) {
+		if (!req.body.imageURL) {
 			return res.render('There is no image!');
 		}
+		var key = '70a5f8d52d2d4d34909ddf5f3624782c';
+		var listImage = req.body.imageURL;
+		listImage.splice(0, 1);
+		listImage.splice(0, 1);
+		console.log(listImage);
 		Student.find({}).exec(function(err,students){
 			if (err) {
 				return next(err);
@@ -66,10 +69,12 @@ module.exports = {
 	/* @author: quang */
 	/* submit Identical PersonId */
 	submitIndenticalPersonId: function(req, res, next) {
-		var listIdenticalPersonId = req.body.identicalPersonId;
-		if (!listIdenticalPersonId) {
+		if (!req.body.identicalPersonId) {
 			listIdenticalPersonId = [];
 		}
+		var listIdenticalPersonId = req.body.identicalPersonId;
+		listIdenticalPersonId.splice(0, 1);
+		listIdenticalPersonId.splice(0, 1);
 		Student.find({}).exec(function(err, students) {
 			async.forEachSeries(students, function(student, callback) {
                 if (err) {
@@ -96,6 +101,33 @@ module.exports = {
                 }
             });
 		});
+	},
+
+	/* @author: quang */
+	/* verify face by one click: edit of video_api_upload with auto processing */
+	verify_by_one_click: function(req, res, next) {
+		var apiURL = 'https://api.projectoxford.ai/video/v1.0/trackface';
+		res.render('all-in-one/verify-by-one-click', {
+			apiURL: apiURL, 
+			subKey: subKey,
+			apiPassword: apiPassword, 
+		});
+	},
+
+	/* @author: quang */
+	/* edit of video_api_wait_for_result with auto processing */
+	analyze_video_auto_processing: function(req, res, next) {
+		var operationLocation = req.query.operationLocation;
+		var uploadedVideoURL = req.query.uploadedVideoURL;
+		if(regex.test(operationLocation)){
+			res.render('all-in-one/analyze-image-auto-processing', {
+				operationLocation: operationLocation,
+				uploadedVideoURL: uploadedVideoURL,
+				subKey: subKey
+			});
+		} else {
+			res.send('Operation Location is not valid!');
+		}
 	},
 	
 	/* @author: ngbaanh */
