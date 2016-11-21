@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify by one click</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/jquery.validate.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/dataTables.bootstrap.min.js"></script>
+    <script src="/javascripts/script.js"></script>
+</head>
+<body>
+	<div class="container">
+		<h1> <a href="/" class="btn btn-default pull-right"><i class="glyphicon glyphicon-home"></i></a></h1>
+		<div class="row">
+			<div class="well text-center">
+				<input type="text" id="projectId" class="hidden" value="fxipdx3zn1">
+				<input type="text" id="apiPassword" class="hidden" value="<%=apiPassword%>">
+				<button type="button" id="btn-upload-video" class="btn btn-success btn-lg">Upload video</button>
+				<form id="FormFile" class="form form-horizontal" method="post">
+					<div class="row">
+						<div class="col-sm-3">
+							<input type="text" name="name" id="name" class="hidden" placeholder="New Video Name">
+						</div>
+						<div class="col-sm-9">
+							<input type="file" name="file" id="file" class="hidden" value="Choose a file" accept=".mp4">
+						</div>
+					</div>
+				</form>
+			</div>
+			
+			<div class="well text-center">
+				<h3 id="FormUrlHeading">Process will be continue automatic after upload successfully</h3>
+				<form id="FormURL" class="hidden" method="post">
+					<input type="url" id="url" class="form-control" name="url">
+				</form>
+			</div>
+		</div>
+	</div>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#btn-upload-video").on('click', function() {
+			$("#file").click();
+		});
+		$("#file").onchange = function() {
+		    uploadFile();
+		};
+		function uploadFile() {
+            var form = new FormData();
+			var file = $('#file')[0].files[0];
+			form.append('file', file);
+			form.append('name', $('#FormFile #name').val());
+			$('#FormFileUploadBtn').attr('disabled','disabled');
+			$('#spinIcon').css('display','inline');
+			var params = {
+				api_password : $('#apiPassword').val(), 
+				project_id : $('#projectId').val(), 
+			};
+			$.ajax({
+				async: true,
+				crossDomain: true,
+				url: 'https://upload.wistia.com?' + $.param(params),
+				method: 'POST',
+				processData: false,
+				contentType: false,
+				mimeType: 'multipart/form-data',
+				dataType: 'json',
+				data: form,
+				success: function(data) {
+					if (data.error) {
+						alert("Lỗi: " + data.error);
+					} else {
+						loadMediaList();
+						$('#controlButton').css('display','block');
+						$('#message').parent().css('display','block');
+						$('#message').text(JSON.stringify(data, null, 2));						
+						var hashedId = data.hashed_id;
+						$('#hashedId').html(hashedId);
+						sendVideoURL();
+					}
+				},
+				error: function(e) {
+					alert('Gửi Ajax Request thất bại!');
+				},
+				complete: function() {
+					$('#spinIcon').css('display','none');
+				}, 
+			});
+			e.preventDefault();
+        }   
+
+		// URL form submit event
+		$('#FormURL').submit(function(event) {
+			var params = {
+				// Request parameters
+			};
+			$.ajax({
+				url: '<%=apiURL%>?' + $.param(params),
+				beforeSend: function(xhrObj){
+					xhrObj.setRequestHeader('Content-Type', 'application/json');
+					xhrObj.setRequestHeader('Ocp-Apim-Subscription-Key', '<%=subKey%>');
+				},
+				type: 'POST',
+				data: '{ "url" : "'+ $('#FormURL #url').val() +'"}',
+				success: function(data, status, request) {
+					$('#info').append('Đang gửi dữ liệu...').delay(5000);
+					window.location.replace('/video-api/wait-for-result?operationLocation=' +request.getResponseHeader('Operation-Location') +'&uploadedVideoURL=' + $('#FormURL #url').val());
+				},
+				fail: function() {
+					alert('Lỗi! Coi lại dữ liệu');
+				}, 
+			});
+			event.preventDefault();
+		});
+	});
+
+	function sendVideoURL() {
+		$().ready(function () {
+			$('#spinIcon').css('display','inline');
+			$('#InfoModal #videoAssets').html('');
+			var params = {
+				api_password : $('#apiPassword').val(), 
+				project_id : $('#projectId').val(), 
+			};
+			$.ajax({
+				url: 'https://api.wistia.com/v1/medias/' + $('#hashedId').html() + '.json?' + $.param(params),
+				method: 'GET',
+				success: function(data) {
+					if (data.status == 'ready') {
+						$('#spinIcon').css('display','none');
+						$('#url').val(data.assets[0].url + '/file.mp4');
+						$('#FormUrlHeading').css('color', 'red');
+						$('#FormUrlHeading').css('font-weight', 'bold');
+						$('html, body').animate({ scrollTop: $("#FormURL").offset().top }, 1000);
+					} else {
+						alert('Video chưa sẵn sàng, thử lại sau');
+						return false;
+					}
+					$('#FormURL').submit();
+				},
+				complete: function(data) {
+					$('#spinIcon').css('display','none');
+				}, 
+			});
+		});
+	}
+</script>
+<div style="display:none" id="hashedId"></div>
+</body>
+</html>

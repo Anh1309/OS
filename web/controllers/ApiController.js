@@ -2,7 +2,8 @@
 var subKey = '6d4c2daabe474357aa15ebf5df19b57c'; // for fast test only, please keep it in DB instead
 var regex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
 var apiPassword = '7b6c2586a7a64ea9497bf2ccd094f71b8d0423dfd815a4978b00db5092977d38'; //Wistia API access Token
-
+var Student = require('../models/Student');
+var async = require('async');
 module.exports = {
 	/* @author: ngbaanh */
 	/* Show upload form with subscription key inside */
@@ -48,9 +49,105 @@ module.exports = {
 	/* @author: phuc */
 	/* test compare face with face using face-api */
 	comparePersonFace: function(req, res, next){
-		var key = '70a5f8d52d2d4d34909ddf5f3624782c';	
-		var listImage = [];
-		listImage.push("https://scontent-hkg3-1.xx.fbcdn.net/t31.0-8/13909186_1130987973635466_983780621913768657_o.jpg");
-		res.render('face-api/comparePersonFace',{key:key,listImage:listImage});
-	}
+		if (!req.body.imageURL) {
+			return res.render('There is no image!');
+		}
+		var key = '70a5f8d52d2d4d34909ddf5f3624782c';
+		var listImage = req.body.imageURL;
+		listImage.splice(0, 1);
+		listImage.splice(0, 1);
+		console.log(listImage);
+		Student.find({}).exec(function(err,students){
+			if (err) {
+				return next(err);
+			}
+
+			res.render('face-api/comparePersonFace',{key:key,listImage:listImage, students:students});
+		});
+	},
+
+	/* @author: quang */
+	/* submit Identical PersonId */
+	submitIndenticalPersonId: function(req, res, next) {
+		if (!req.body.identicalPersonId) {
+			listIdenticalPersonId = [];
+		}
+		var listIdenticalPersonId = req.body.identicalPersonId;
+		listIdenticalPersonId.splice(0, 1);
+		listIdenticalPersonId.splice(0, 1);
+		Student.find({}).exec(function(err, students) {
+			async.forEachSeries(students, function(student, callback) {
+                if (err) {
+                    callback(err);
+                } else {
+                    if (listIdenticalPersonId.indexOf(student.personId)>-1) {
+                    	student.status = 1;
+                    } else {
+                    	student.status = 0;
+                    }
+                    student.save(function(err, student) {
+                    	if (err) {
+		                    callback(err);
+		                } else {
+		                    callback();
+		                }
+                    });
+                }
+            }, function (err) {
+                if (err) {
+                    return next(err);
+                } else {
+                    res.redirect('/student-list');
+                }
+            });
+		});
+	},
+
+	/* @author: quang */
+	/* verify face by one click: edit of video_api_upload with auto processing */
+	verify_by_one_click: function(req, res, next) {
+		var apiURL = 'https://api.projectoxford.ai/video/v1.0/trackface';
+		res.render('all-in-one/verify-by-one-click', {
+			apiURL: apiURL, 
+			subKey: subKey,
+			apiPassword: apiPassword, 
+		});
+	},
+
+	/* @author: quang */
+	/* edit of video_api_wait_for_result with auto processing */
+	analyze_video_auto_processing: function(req, res, next) {
+		var operationLocation = req.query.operationLocation;
+		var uploadedVideoURL = req.query.uploadedVideoURL;
+		if(regex.test(operationLocation)){
+			res.render('all-in-one/analyze-image-auto-processing', {
+				operationLocation: operationLocation,
+				uploadedVideoURL: uploadedVideoURL,
+				subKey: subKey
+			});
+		} else {
+			res.send('Operation Location is not valid!');
+		}
+	},
+	
+	/* @author: ngbaanh */
+	/* receive image url list and verify all of them for checking attendance */
+	verifyFaces: function(req, res, next) {
+		var faceApiKey = '70a5f8d52d2d4d34909ddf5f3624782c'; // Phuc's key
+		var operationLocation = req.query.operationLocation;
+		var uploadedVideoURL = req.query.uploadedVideoURL;
+		Student.find({}, '-_id', function(err, data){
+            if (err) {
+                return next(err);
+            } else {
+                res.render('face-api/verify-faces', {
+					subKey: subKey, 
+					faceApiKey: faceApiKey,
+					operationLocation: operationLocation, 
+					uploadedVideoURL: uploadedVideoURL, 
+					studentList: data, 
+				});
+            }
+        });
+	}, // Last-Element.
 };
