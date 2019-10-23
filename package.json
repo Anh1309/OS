@@ -16,7 +16,7 @@
     "express-flash": "0.0.2",
     "express-session": "^1.14.2",
     "jade": "~1.11.0",
-    "mongoose": "^4.6.8",
+    "mongoose": "^5.7.6",
     "mongoose-datatables": "^2.0.1",
     "morgan": "~1.7.0",
     "nodemailer": "^2.6.4",
